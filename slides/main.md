@@ -170,7 +170,7 @@ class: center, middle
 
 * パスの形式（個人名・グループ名/リポジトリ名）
 
-* README.md, Compare, Issue, Merge Request
+* README.md, Commit, Compare, Merge Request
 
 ---
 
@@ -529,6 +529,6 @@ Gitlab の画面から変更内容が反映されていることを確認でき�
 
 * 「Git - Book」 https://git-scm.com/book/ja/v2
 
-GitHub のエコシステムを使った開発は以下の書籍が参考になります。(お貸しできます！）
+GitHub を使った開発は以下の書籍が参考になります。(お貸しできます！）
 
 * 「GitHub 実践入門」 https://gihyo.jp/book/2014/978-4-7741-6366-6
