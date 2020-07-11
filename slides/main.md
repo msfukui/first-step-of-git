@@ -231,6 +231,8 @@ README.md というファイルを一つ持つプロジェクトを新規に作�
 
 * ディレクトリ作成と初期化 (init)
 
+    `git init` で、指定したディレクトリの配下全てが git の管理下になります。
+
     ```
     $ mkdir example
     $ cd example
@@ -238,7 +240,13 @@ README.md というファイルを一つ持つプロジェクトを新規に作�
     Initialized empty Git repository in /.../example/.git/
     ```
 
-作成したディレクトリの配下全てが git の管理下になります。
+    一番上のディレクトリには `.git` という管理用のディレクトリが作られます。
+
+    ```
+    $ ls -a
+    .  ..  .git
+    $
+    ```
 
 ---
 
@@ -334,6 +342,9 @@ c.f. https://commonmark.org
 
     先に Gitlab のトップ画面から New Project でリモートリポジトリを新規に作成します。
 
+    \# 以下の `https://example.com/msfukui/example.git` は一例です。  
+    \# 実際には、作成したリモートリポジトリの URL を指定してください。
+
     ```
     $ git remote add origin https://example.com/msfukui/example.git
     $ git remote show origin
@@ -360,9 +371,9 @@ c.f. https://commonmark.org
     Branch 'master' set up to track remote branch 'master' from 'origin'.
     ```
 
-    `-u` は現在のローカルリポジトリをリモートリポジトリに紐づけるための設定です。
+    `-u` は現在のローカルリポジトリをリモートリポジトリに紐づけるためのオプションです。
 
-    最初のリモートリポジトリへの反映にのみ指定します。
+    最初のリモートリポジトリへの反映の際にのみ指定します。
 
 Gitlab の画面から変更内容が反映されていることを確認できれば完了です。
 
@@ -400,6 +411,8 @@ Gitlab の画面から変更内容が反映されていることを確認でき�
 
 <img src="slides/worktree_index_repository.png" alt="How Git works" width="70%">
 
+<p><small>※引用元: 【Git入門】git status の使い方（ファイルの状態を確認する） <a href="https://26gram.com/git-status">https://26gram.com/git-status</a></small></p>
+
 ---
 
 ### ローカルリポジトリとリモートリポジトリ
@@ -408,9 +421,11 @@ Gitlab の画面から変更内容が反映されていることを確認でき�
 
 個々のPCには、ローカルリポジトリの他に、リモートリポジトリのコピーも保存されている
 
+<p><small>※引用元: Gitが、おもしろいほどわかる基本の使い方33_Chapter1-02 <a href="https://www.mdn.co.jp/di/contents/3421/41576/">https://www.mdn.co.jp/di/contents/3421/41576/</a></small>
+
 ---
 
-### コミットハッシュ
+### コミットとコミットハッシュ
 
   ```
   $ git log
@@ -421,31 +436,211 @@ Gitlab の画面から変更内容が反映されていることを確認でき�
       First commit
   ```
 
-* コミット単位で SHA-1 による一意キー（コミットハッシュ）が生成される
+コミット単位で SHA-1 による一意キー（コミットハッシュ）が生成される
 
-    ログにある `421ac...` の部分
+* ログにある `421ac...` の部分がコミットハッシュ
 
-    先頭4〜7文字だけでも有効 (short hash)
+* 先頭4〜7文字だけでも有効 (short hash)
 
-* より詳しい仕組みを知りたい人は..
+* Git は、コミット単位で変更を管理する
 
-    Gitのコミットハッシュ値は何を元にどうやって生成されているのか | Mercari Engineering Blog
-
-    https://tech.mercari.com/entry/2016/02/08/173000
+<p>
+<small>※より詳しい仕組みを知りたい人は..<br />
+Gitのコミットハッシュ値は何を元にどうやって生成されているのか | Mercari Engineering Blog<br />
+<a href="https://tech.mercari.com/entry/2016/02/08/173000">https://tech.mercari.com/entry/2016/02/08/173000</a></small>
+</p>
 
 ---
 
-## Git の操作 (続き)（※次回があれば..）
+## Git の操作 (続き)
+
+### コミットをやり直す (commit --amend)
+
+`README.md` に文章を追加して..
+
+```
+$ echo "" >> README.md
+$ echo "## Hello, world" >> README.md
+$ cat README.md
+# Example
+
+## Hello, world
+```
+
+---
+
+変更したファイルをインデックス(ステージ)に上げて..
+
+```
+$ git status
+On branch master
+Changes not staged for commit:
+  (use "git add <file>..." to update what will be committed)
+  (use "git restore <file>..." to discard changes in working directory)
+  modified:   README.md
+
+no changes added to commit (use "git add" and/or "git commit -a")
+$ git add .
+$ git status
+On branch master
+Changes to be committed:
+  (use "git restore --staged <file>..." to unstage)
+  modified:   README.md
+```
+
+\# `git add .` とすると、<br />
+\# `.` (今のディレクトリ)の配下全部のファイルを、まとめてインデックスに上げることができます。
+
+---
+
+コミットしたが..
+
+```
+$ git commit -m "Add Hello, wrold"
+[master a167513] Add Hello, wrold
+ 1 file changed, 2 insertions(+)
+```
+
+うっわ、コミットメッセージのスペル間違えた..🙍<br />
+恥ずかしい..😓 どないしよ..
+
+```
+$ git log
+commit a167513c86329587fa25184e0eb3be37524b723b (HEAD -> master)
+Author: msfukui <msfukui@gmail.com>
+Date:   Sat Jul 11 20:00:39 2020 +0900
+
+    Add Hello, wrold
+
+commit 6c14441ef60f2c0ba2a15464cae91dcb1e876bd4
+Author: msfukui <msfukui@gmail.com>
+Date:   Sat Jul 11 19:59:34 2020 +0900
+
+    First commit
+```
+
+---
+
+`git commit` のオプションの `--amend` を使うと、直前のコミットを取り消して、<br />
+現在の状態で再度コミットをやり直すことができます。
+
+```
+$ git commit --amend -m "Add Hello, world"
+[master a717807] Add Hello, world
+ Date: Sat Jul 11 20:00:39 2020 +0900
+ 1 file changed, 2 insertions(+)
+$ git log
+commit a71780770b122aa800ef2d8f0a7793de4e168cdf (HEAD -> master)
+Author: msfukui <msfukui@gmail.com>
+Date:   Sat Jul 11 20:00:39 2020 +0900
+
+    Add Hello, world
+
+commit 6c14441ef60f2c0ba2a15464cae91dcb1e876bd4
+Author: msfukui <msfukui@gmail.com>
+Date:   Sat Jul 11 19:59:34 2020 +0900
+
+    First commit
+```
+
+今の状態から追加で変更して、前のコミットと合わせてコミットを一つにする場合にも使えます。
+
+---
 
 ### 戻す
 
-* 変更を明示的に取り消す (revert)
+### 変更をなかったことにする (reset)
 
-* 変更をなかったことにする (reset)
+c.f. https://qiita.com/shuntaro_tamura/items/db1aef9cf9d78db50ffe
 
-### やり直す
+とても説明がわかりやすいので、実行する前には一度読んでおくことをお勧めします。
 
-* 確定（コミット）をやり直す (commit --amend)
+`reset` は指定方法によっては、変更内容が一部失われてしまう可能性があります。
+
+特に、リモートリポジトリに push した後の reset は、他の人にも影響が及びます。<br />
+他の人には影響がないと確信できる場合を除き、原則はできないと思った方がよいです。
+
+使用上の注意をよく読み、用法・用量を守って正しくお使いください。🏥💊
+
+---
+
+`git reset` は以下の様に指定します。
+
+```
+$ git reset [(1)ワークツリー、インデックスをどうしたい?] [(2)最新のコミットをどこにしたい?]
+```
+
+(1) は以下のオプションから設定します。
+
+* `--soft` は、インデックス(ステージ)まで戻します。
+
+* `--mixed` (デフォルト) は、ワークツリーまで戻します。
+
+* `--hard` は、ワークツリー、インデックスともなかった状態に戻します。
+
+    \# 変更が全て吹っ飛ぶので危険! 指定は慎重に!
+
+(2) はどこまで戻すかを、コミットハッシュまたはコミットを示す別名(エイリアス)で指定します。
+
+* `HEAD` は、最新のコミットを指し示す別名(エイリアス)です。
+
+* `HEAD^` は、ひとつ前のコミットを指し示す別名(エイリアス)です。
+
+* `HEAD^^^` (三つ前)なども指定できます。
+
+---
+
+#### よく使う例
+
+* コミット状態をひとつ前のコミットに戻して、そこからの変更はインデックスに上がった状態にする
+
+    ```
+    $ git reset --soft HEAD^
+    ```
+
+    追加で変更してコミットし直すだけなら `commit --amend` を使う方が楽かもしれないです。
+
+* コミット状態をひとつ前のコミットに戻して、そこからの変更はワークツリーに戻す
+
+    ```
+    $ git reset HEAD^
+    ```
+
+* コミット状態をひとつ前のコミットにして、そこからの変更は全部消す
+
+    \# 危険! 実行時は注意!
+
+    ```
+    $ git reset --hard HEAD^
+    ```
+
+---
+
+* 現在インデックス(ステージ)に上がっている状態を全てワークツリーに戻す
+
+    ```
+    $ git reset HEAD
+    ```
+
+* 最新のコミット状態に戻して、そこからの変更点は全てなかったことにする
+
+    \# 危険! 実行時は注意!
+
+    最後のコミットからのワークツリー、インデックス(ステージ)の内容を消し飛ばします。
+
+    ```
+    $ git reset --hard HEAD
+    ```
+
+* **[重要]** 直前の `git reset` を取り消す (取り消しの取り消し)
+
+    ```
+    $ git reset --hard ORIG_HEAD
+    ```
+
+    `ORIG_HEAD` は前回 `reset` した際の `HEAD` を指しています。
+
+    \# これで戻せなかったら詳しい人を呼んで一緒に泣きましょう..。
 
 ---
 
@@ -483,13 +678,17 @@ Gitlab の画面から変更内容が反映されていることを確認でき�
 
 ### その他
 
-  * tag, stash, cherrypick
+  * revert, tag, stash, cherrypick
 
   * first-forward (ff) と non-fast-forward (no-ff)
 
   * .gitignore
 
+  * コミットの頻度
+
   * コミットログの書き方
+
+  * コマンドエイリアス
 
 ---
 
@@ -515,20 +714,22 @@ Gitlab の画面から変更内容が反映されていることを確認でき�
 
 ## 参考
 
-以下から画像を借用させていただきました。
-
-* 【Git入門】git status の使い方（ファイルの状態を確認する）
-
-  https://26gram.com/git-status
-
-* Gitが、おもしろいほどわかる基本の使い方33_Chapter1-02
-
-  https://www.mdn.co.jp/di/contents/3421/41576/
-
 無料で読める Git のマニュアルには以下があります。
 
-* 「Git - Book」 https://git-scm.com/book/ja/v2
+* 「Git - Book」
 
-GitHub を使った開発は以下の書籍が参考になります。(お貸しできます！）
+    https://git-scm.com/book/ja/v2
 
-* 「GitHub 実践入門」 https://gihyo.jp/book/2014/978-4-7741-6366-6
+Progate の Git のコースはとてもよい評価をお聞きしました。(n = 2)
+
+* Git ソースコードのバージョン管理や共同開発を可能にするツール
+
+    https://prog-8.com/languages/git
+
+* ドットインストール https://dotinstall.com/lessons/basic_git もいいかもです。
+
+GitHub を使った共同開発については、以下の書籍が参考になります。(お貸しできます！）
+
+* 「GitHub 実践入門」
+
+    https://gihyo.jp/book/2014/978-4-7741-6366-6
