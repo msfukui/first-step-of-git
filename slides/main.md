@@ -415,7 +415,7 @@ Gitlab の画面から変更内容が反映されていることを確認でき�
 
 ---
 
-### ローカルリポジトリとリモートリポジトリ
+### リモートリポジトリとローカルリポジトリ
 
 <img src="slides/local_and_remote_repository.jpg" alt="local and remote repogitory" width="52%">
 
@@ -452,7 +452,79 @@ Gitのコミットハッシュ値は何を元にどうやって生成されて�
 
 ---
 
-## Git の操作 (続き)
+## Git の操作 (続き) (1/4)
+
+* **取り消し**
+
+    * ひとつ前をやり直す (commit --amend)
+
+    * 取り消す (reset, revert)
+
+* **ブランチとマージ**
+
+    * ブランチの作成 (branch)
+
+    * ブランチの移動 (checkout)
+
+    * ブランチのマージ (merge)
+
+---
+
+## Git の操作概要 (続き) (2/4)
+
+* **リモートリポジトリの操作**
+
+    * リモートリポジトリから変更を取得する (pull)
+
+    * リモートリポジトリに変更を反映する (push)
+
+    * Merge Request の発行とマージ
+
+---
+
+## Git の操作概要 (続き) (3/4)
+
+* コミットの整理
+
+    * 複数のコミットを整理する (rebase)
+
+    * 複数のコミットを一つにまとめる (squash)
+
+* 歴史の改竄
+
+    * リモートリポジトリを強制的に上書きする (push -f)
+
+* 調べる
+
+    * プロジェクト内のコードをまとめて grep する (grep)
+
+* コミットに名前をつける (tag)
+
+---
+
+## Git の操作概要 (続き) (4/4)
+
+* その他覚えておくと便利なもの
+
+    * 編集中の内容を一時退避する (stash)
+
+    * 特定のコミットの変更内容を抜き出して適用する (cherrypick)
+
+* コマンド以外で理解しておきたいこと
+
+    * first-forward (ff) と non-fast-forward (no-ff) の違い
+
+    * リポジトリ管理の対象外のファイルリスト (.gitignore)
+
+    * コミットの頻度
+
+    * コミットログの書き方
+
+    * コマンドエイリアス
+
+---
+
+## Git の操作 (取り消し)
 
 ### コミットをやり直す (commit --amend)
 
@@ -547,27 +619,29 @@ Date:   Sat Jul 11 19:59:34 2020 +0900
 
 ---
 
-### 戻す
-
 ### 変更をなかったことにする (reset)
 
-c.f. https://qiita.com/shuntaro_tamura/items/db1aef9cf9d78db50ffe
+`reset` は、現在の最新のコミットを、指定したある時点のコミットに変更するコマンドです。
 
-とても説明がわかりやすいので、実行する前には一度読んでおくことをお勧めします。
+指定方法によっては、これまでの変更内容が一部失われてしまう可能性があります。
 
-`reset` は指定方法によっては、変更内容が一部失われてしまう可能性があります。
-
-特に、リモートリポジトリに push した後の reset は、他の人にも影響が及びます。<br />
+特に、リモートリポジトリに `push` した後の `reset` は、他の人にも影響が及びます。<br />
 他の人には影響がないと確信できる場合を除き、原則はできないと思った方がよいです。
 
 使用上の注意をよく読み、用法・用量を守って正しくお使いください。🏥💊
 
+<p>
+<small>※とても説明がわかりやすいので、実行する前には一度読んでおくことをお勧めします。<br />
+c.f. [git reset (--hard/--soft)]ワーキングツリー、インデックス、HEADを使いこなす方法 - Qiita<br />
+<a href="https://qiita.com/shuntaro_tamura/items/db1aef9cf9d78db50ffe">https://qiita.com/shuntaro_tamura/items/db1aef9cf9d78db50ffe</a></small>
+</p>
+
 ---
 
-`git reset` は以下の様に指定します。
+`reset` は以下の様に指定します。
 
 ```
-$ git reset [(1)ワークツリー、インデックスをどうしたい?] [(2)最新のコミットをどこにしたい?]
+$ git reset [(1)ワークツリー、インデックスをどうしたいか?] [(2)最新のコミットをどこにしたいか?]
 ```
 
 (1) は以下のオプションから設定します。
@@ -590,7 +664,7 @@ $ git reset [(1)ワークツリー、インデックスをどうしたい?] [(2)
 
 ---
 
-#### よく使う例
+#### `reset` よく使う例
 
 * コミット状態をひとつ前のコミットに戻して、そこからの変更はインデックスに上がった状態にする
 
@@ -644,51 +718,180 @@ $ git reset [(1)ワークツリー、インデックスをどうしたい?] [(2)
 
 ---
 
-### ブランチとマージ
+### 変更を明示的に打ち消す (revert)
 
-* ブランチの作成 (branch)
+`revert` は特定のコミット、マージを明示的に打ち消すためのコミットを新しく生成します。
 
-* ブランチの移動 (checkout)
+`reset` は編集内容がコミットログには一切残りませんが、 `revert` はこれまでのコミットログは残したまま、コミットを新しく生成する（積み上げる）ところが異なります。
 
-* リモートリポジトリから変更を取得する (pull)
+```
+$ git revert a167513
+[master 6cfab82] Revert "Add Hello, world"
+ 1 file changed, 2 deletions(-)
+$ git log
+commit 6cfab82b59e89d6407b9935d930f5e89b027c96c (HEAD -> master)
+Author: msfukui <msfukui@gmail.com>
+Date:   Mon Jul 27 20:13:35 2020 +0900
 
-* リモートリポジトリに変更を反映する (push)
+    Revert "Add Hello, world"
 
-* ブランチのマージ (merge)
+    This reverts commit a71780770b122aa800ef2d8f0a7793de4e168cdf.
+...
+```
 
-* Merge Request の発行 → merge
-
----
-
-### コミットの整理
-
-  複数のコミットを整理する (rebase)
-
-  複数のコミットを一つにまとめる (squash)
-
-### 歴史の改竄
-
-  リモートリポジトリを強制的に上書きする (push -f)
+（わかりにくいですが） `hello.rb` の追加が、打ち消されてコミット前の状態に戻っています。
 
 ---
 
-### 調べる
+## ブランチとマージ
 
-  プロジェクト内のコードをまとめて grep する (grep)
+### ブランチ
 
-### その他
+ブランチ = **「枝」**
 
-  * revert, tag, stash, cherrypick
+変更前のコミットに影響を与えずに、複数の人が並行して編集できる様にするための仕組み。
 
-  * first-forward (ff) と non-fast-forward (no-ff)
+実態は「任意のコミットに対して付けられる名前」
 
-  * .gitignore
+---
 
-  * コミットの頻度
+<img src="slides/head-to-master.png" alt="branch" width="75%">
 
-  * コミットログの書き方
+```
+$ git branch testing
+```
 
-  * コマンドエイリアス
+<p><small>※引用元: Git - ブランチとは<br /><a href="https://git-scm.com/book/ja/v2/Git-%E3%81%AE%E3%83%96%E3%83%A9%E3%83%B3%E3%83%81%E6%A9%9F%E8%83%BD-%E3%83%96%E3%83%A9%E3%83%B3%E3%83%81%E3%81%A8%E3%81%AF">https://git-scm.com/book/ja/v2/Git-のブランチ機能-ブランチとは</a></small></p>
+
+---
+
+<img src="slides/head-to-testing.png" alt="branch" width="75%">
+
+```
+$ git checkout testing
+```
+
+参考: `git checkout -b testing` で、 branch と checkout をまとめて一つのコマンドで実行できます。
+
+---
+
+<img src="slides/advance-testing.png" alt="branch" width="75%">
+
+```
+$ vim test.rb
+...
+$ git add test.rb
+$ git commit -m 'made other changes'
+```
+
+ひとつコミットすると、testing ブランチと現在の最新のコミット (HEAD) がひとつ先に進みます。
+
+---
+
+<img src="slides/checkout-master.png" alt="branch" width="75%">
+
+```
+$ git checkout master
+```
+
+HEAD が指すコミットを master に移動します。
+
+履歴が一旦巻き戻った様に見えます。
+
+---
+
+<img src="slides/advance-master.png" alt="branch" width="75%">
+
+ひとつコミットして master を進めると、変更の履歴が二つに分岐します。
+
+---
+
+### マージ
+
+マージは、複数のブランチをまとめて一つにします。
+
+```
+$ git merge [マージしたいブランチ名]
+```
+
+#### オートマージに成功した場合
+
+```
+$ git merge testing
+Merge made by the 'recursive' strategy.
+hello.rb |    1 +
+1 file changed, 1 insertion(+)
+```
+
+<p>
+<small>※Git のマージ戦略の詳細を知りたい方は..<br />
+アルゴリズム - Git の 3-way merge とは具体的にどのようなアルゴリズムですか？ - スタック・オーバーフロー<br />
+<a href="https://ja.stackoverflow.com/questions/52019/git-%E3%81%AE-3-way-merge-%E3%81%A8%E3%81%AF%E5%85%B7%E4%BD%93%E7%9A%84%E3%81%AB%E3%81%A9%E3%81%AE%E3%82%88%E3%81%86%E3%81%AA%E3%82%A2%E3%83%AB%E3%82%B4%E3%83%AA%E3%82%BA%E3%83%A0%E3%81%A7%E3%81%99%E3%81%8B">https://ja.stackoverflow.com/questions/52019/git-の-3-way-merge-とは具体的にどのようなアルゴリズムですか</a></small>
+</p>
+
+---
+
+#### コンフリクトした場合
+
+```
+$ git merge testing
+Auto-merging hello.rb
+CONFLICT (content): Merge conflict in hello.rb
+Automatic merge failed; fix conflicts and then commit the result.
+$ cat hello.rb
+puts 'Hello, world'
+<<<<<<< HEAD
+puts 'See you tomorrow!'
+=======
+puts 'Good by'
+>>>>>>> testing
+```
+
+* どこがコンフリクトしているかは示してくれる
+
+    * 上記の `<<<<<<<` から `>>>>>>>` で区切られた行
+
+    * 複数の行の塊がコンフリクトすることもあり得る
+
+* コンフリクトの解消には、手で直して add して commit しないといけない
+
+    有効なのは HEAD? testing? 両方とも有効? 両方ともだめ? 一部だけ?
+
+---
+
+## リモートリポジトリの操作
+
+(再掲)
+
+<img src="slides/local_and_remote_repository.jpg" alt="local and remote repogitory" width="52%">
+
+---
+
+### リモートリポジトリから変更を取得する (pull)
+
+```
+$ git pull origin master
+```
+
+リモートの `origin` リポジトリの `master` ブランチの内容を取得して、<br />
+ローカルリポジトリの `master` ブランチにマージする。
+
+### リモートリポジトリに変更を反映する (push)
+
+```
+$ git push origin master
+```
+
+ローカルリポジトリの `master` ブランチの内容を、<br />
+リモートの `origin` リポジトリの `master` ブランチにマージする。
+
+---
+
+### Merge Request の発行とマージ
+
+Gitlab の画面から、リモートリポジトリのブランチをマージするリクエストを発行することができます。
+
+<img src="slides/gitlab_merge_request.png" alt="gitlab merge request" width="80%">
 
 ---
 
