@@ -771,7 +771,8 @@ $ git branch testing
 $ git checkout testing
 ```
 
-`git checkout -b testing` で branch と checkout をまとめて一つのコマンドで実行することもできます。
+\# `git checkout -b testing` とすると<br />
+\# branch と checkout をまとめて一つのコマンドで実行することもできます。
 
 <img src="slides/head-to-testing.png" alt="branch" width="75%">
 
