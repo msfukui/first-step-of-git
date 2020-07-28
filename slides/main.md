@@ -32,7 +32,7 @@ class: center, middle
 
 ## 最初の一歩
 
-2020/07/02 @msfukui
+2020/07/28 @msfukui
 
 ---
 class: center, middle
@@ -745,37 +745,37 @@ Date:   Mon Jul 27 20:13:35 2020 +0900
 
 ## ブランチとマージ
 
-### ブランチ
-
-ブランチ = **「枝」**
+### ブランチ = **「枝」**
 
 変更前のコミットに影響を与えずに、複数の人が並行して編集できる様にするための仕組み。
 
-実態は「任意のコミットに対して付けられる名前」
+実態は「任意のコミットに対して付けられる名前」（ポインタ）
+
+<img src="slides/branch_image.png" alt="branch" width="75%">
+
+<p><small>※引用元: git ブランチを合流するマージ: プログラマの歩き方 <a href="http://zorinos.seesaa.net/article/451407561.html">http://zorinos.seesaa.net/article/451407561.html</a></small></p>
 
 ---
-
-<img src="slides/head-to-master.png" alt="branch" width="75%">
 
 ```
 $ git branch testing
 ```
 
+<img src="slides/head-to-master.png" alt="branch" width="75%">
+
 <p><small>※引用元: Git - ブランチとは<br /><a href="https://git-scm.com/book/ja/v2/Git-%E3%81%AE%E3%83%96%E3%83%A9%E3%83%B3%E3%83%81%E6%A9%9F%E8%83%BD-%E3%83%96%E3%83%A9%E3%83%B3%E3%83%81%E3%81%A8%E3%81%AF">https://git-scm.com/book/ja/v2/Git-のブランチ機能-ブランチとは</a></small></p>
 
 ---
-
-<img src="slides/head-to-testing.png" alt="branch" width="75%">
 
 ```
 $ git checkout testing
 ```
 
-参考: `git checkout -b testing` で、 branch と checkout をまとめて一つのコマンドで実行できます。
+`git checkout -b testing` で branch と checkout をまとめて一つのコマンドで実行することもできます。
+
+<img src="slides/head-to-testing.png" alt="branch" width="75%">
 
 ---
-
-<img src="slides/advance-testing.png" alt="branch" width="75%">
 
 ```
 $ vim test.rb
@@ -786,9 +786,9 @@ $ git commit -m 'made other changes'
 
 ひとつコミットすると、testing ブランチと現在の最新のコミット (HEAD) がひとつ先に進みます。
 
----
+<img src="slides/advance-testing.png" alt="branch" width="75%">
 
-<img src="slides/checkout-master.png" alt="branch" width="75%">
+---
 
 ```
 $ git checkout master
@@ -798,11 +798,20 @@ HEAD が指すコミットを master に移動します。
 
 履歴が一旦巻き戻った様に見えます。
 
+<img src="slides/checkout-master.png" alt="branch" width="75%">
+
 ---
 
-<img src="slides/advance-master.png" alt="branch" width="75%">
+```
+$ vim test.rb
+...
+$ git add test.rb
+$ git commit -m 'made another changes'
+```
 
-ひとつコミットして master を進めると、変更の履歴が二つに分岐します。
+さらに別の内容をひとつコミットして master を進めると、変更の履歴が二つに分岐します。
+
+<img src="slides/advance-master.png" alt="branch" width="75%">
 
 ---
 
